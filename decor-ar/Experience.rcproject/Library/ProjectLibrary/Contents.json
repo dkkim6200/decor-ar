@@ -1,0 +1,57 @@
+[
+  {
+    "libraryIdentifier" : "7e7db815407d4a0cf2281ae1ff41d38e",
+    "format" : "model",
+    "displayName" : "model.usdz"
+  },
+  {
+    "libraryIdentifier" : "59c2a7c6a6cce628977cfa153e6a5383",
+    "format" : "model",
+    "displayName" : "scene.usdz"
+  },
+  {
+    "libraryIdentifier" : "cc7caa731fb8d549698c3c7f47e12bf8",
+    "format" : "model",
+    "displayName" : "bookshelf-colored.usdz"
+  },
+  {
+    "libraryIdentifier" : "40570b305dc8991b54fd36de0b253d59",
+    "format" : "model",
+    "displayName" : "bookshelf-colored.usdz"
+  },
+  {
+    "libraryIdentifier" : "1364f241b803ed36cb027927c0a84763",
+    "format" : "model",
+    "displayName" : "bookshelf-white.usdz"
+  },
+  {
+    "libraryIdentifier" : "f10a383468318f55add6c6b2b0b7f9af",
+    "format" : "model",
+    "displayName" : "bookshelf-white.usdz"
+  },
+  {
+    "libraryIdentifier" : "5f8d3b7b7a91207fe896893ea7eca315",
+    "format" : "model",
+    "displayName" : "bookshelf-white copy.usdz"
+  },
+  {
+    "libraryIdentifier" : "a567a5ba13ca949c87b8d53798c542cd",
+    "format" : "model",
+    "displayName" : "bookshelf-white.usdz"
+  },
+  {
+    "libraryIdentifier" : "9d389811d8faa3b7ceb7779a64f62198",
+    "format" : "model",
+    "displayName" : "bookshelf-white copy.usdz"
+  },
+  {
+    "libraryIdentifier" : "2d059fa0fe514723ff9770b2d70ad9ec",
+    "format" : "model",
+    "displayName" : "bookshelf-colored.usdz"
+  },
+  {
+    "libraryIdentifier" : "14ebd73d333087301aa370bb61f76de7",
+    "format" : "model",
+    "displayName" : "bookshelf-white.usdz"
+  }
+]

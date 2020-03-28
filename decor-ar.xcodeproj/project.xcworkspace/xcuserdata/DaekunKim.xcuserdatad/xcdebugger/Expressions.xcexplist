@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "ARViewContainer.changeFurnitureAlpha(to:):ContentView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "(iphone_ar.Experience.Furniture)self.furnitureAnchor">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
