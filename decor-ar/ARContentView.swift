@@ -22,8 +22,8 @@ struct ARContentView : View {
         ZStack {
         #if !targetEnvironment(simulator)
             arViewModel.edgesIgnoringSafeArea(.all).onTapGesture {
-                self.arViewModel.togglePeopleOcclusion()
-                self.arViewModel.toggleFurnitures()
+//                self.arViewModel.togglePeopleOcclusion()
+                self.arViewModel.confirmFurniturePosition()
             }.gesture(
                 RotationGesture().onChanged { angle in
                     self.arViewModel.setFurnitureRotation(angle: self.furnitureAngle + Float(angle.radians))
@@ -31,7 +31,7 @@ struct ARContentView : View {
                     self.furnitureAngle += Float(angle.radians)
                     self.furnitureAngle = self.furnitureAngle.truncatingRemainder(dividingBy: 2.0 * Float.pi)
                 }
-            )
+            ).allowsHitTesting(self.arViewModel.placingFurniture)
         #endif
             VStack {
                 Spacer()
@@ -69,25 +69,34 @@ struct ARContentView : View {
 
 extension ARContentView {
     final class ARViewModel: NSObject, UIViewRepresentable, ObservableObject, ARSessionDelegate, SFSpeechRecognizerDelegate {
-        @Published var arView : ARView!
+        @Published var arView : ARView! = ARView(frame: .zero)
         
         @Published var recordEnabled : Bool = false
         @Published var infoLabel : String = ""
         
-        private var isFurniturePreview : Bool = true
+        @Published var placingFurniture : Bool = false
+        private var currentFurniture : Entity? = nil
+        private var currentFurniturePreview : Entity? = nil
+        private var currentAnchor : AnchorEntity? = nil
         
         private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))!
         private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
         private var recognitionTask: SFSpeechRecognitionTask?
         private let audioEngine = AVAudioEngine()
         
-        override init() {
-            arView = ARView(frame: .zero)
-        }
+        private var furnitureDict : [String : Entity] = [:]
         
         func makeUIView(context: Context) -> ARView {
             initARView()
             initSpeechRecognizer()
+            
+            let furnitureScene = try! Experience.loadFurniture()
+            furnitureDict[furnitureScene.bookshelf!.name] = furnitureScene.bookshelf
+            furnitureDict[furnitureScene.bookshelfPreview!.name] = furnitureScene.bookshelfPreview
+            
+            for (i, j) in furnitureDict {
+                print("\(i) : \(j)")
+            }
             
             return arView
         }
@@ -151,7 +160,7 @@ extension ARContentView {
             #if !targetEnvironment(simulator) //==============================================================
             switch frame.camera.trackingState {
             case .normal:
-                if (isFurniturePreview) {
+                if (placingFurniture) {
                     let results = arView.raycast(from: arView.center,
                                                 allowing: .existingPlaneInfinite,
                                                 alignment: .horizontal)
@@ -160,10 +169,10 @@ extension ARContentView {
                         return
                     }
                     
-//                    let resultTransform = Transform(matrix: result.worldTransform)
-//                    let rotation = furnitureAnchor.transform.rotation
-//                    furnitureAnchor.move(to: resultTransform, relativeTo: nil)
-//                    furnitureAnchor.transform.rotation = rotation
+                    let resultTransform = Transform(matrix: result.worldTransform)
+                    let rotation = currentAnchor!.transform.rotation
+                    currentAnchor!.move(to: resultTransform, relativeTo: nil)
+                    currentAnchor!.transform.rotation = rotation
                 }
                 
             case .notAvailable:
@@ -174,24 +183,40 @@ extension ARContentView {
             #endif
         }
         
-        func addFurniture(name: String) {
-            let nameLowerCased = name.lowercased()
+        func addFurniture(called name_: String) {
+            let name = name_.lowercased()
             
-            if (nameLowerCased == "bookshelf") {
+            if (name == "bookshelf") {
+                placingFurniture = true
                 
+                currentFurniture = furnitureDict["Bookshelf"]
+                currentFurniturePreview = furnitureDict["Bookshelf Preview"]
+                
+                let bookshelfPreviewModel = findEntityWithModelComponent(e: currentFurniturePreview!)
+    
+                var modelComp : ModelComponent = (bookshelfPreviewModel?.components[ModelComponent])!
+                let mat = SimpleMaterial(color: .init(white: 1.0, alpha: 0.3), isMetallic: false)
+                modelComp.materials = [mat]
+                bookshelfPreviewModel?.components.set(modelComp)
+                
+                currentAnchor = AnchorEntity(plane: .horizontal)
+                currentAnchor?.addChild(currentFurniture!)
+                currentAnchor?.addChild(currentFurniturePreview!)
+                
+                currentFurniture?.isEnabled = false
             }
         }
         
-        func toggleFurnitures() {
+        func confirmFurniturePosition() {
 //            furnitureScene.bookshelf!.isEnabled.toggle()
 //            furnitureScene.bookshelfPreview!.isEnabled.toggle()
-            self.isFurniturePreview.toggle()
+            self.placingFurniture = false
+            currentFurniturePreview?.isEnabled = false
+            currentFurniture?.isEnabled = true
         }
         
         func setFurnitureRotation(angle: Float) {
-            if (isFurniturePreview) {
-//                furnitureAnchor.transform.rotation = .init(angle: -angle, axis: SIMD3<Float>(0, 1, 0))
-            }
+            currentAnchor?.transform.rotation = .init(angle: -angle, axis: SIMD3<Float>(0, 1, 0))
         }
         
         func togglePeopleOcclusion() {
@@ -258,7 +283,7 @@ extension ARContentView {
                     isFinal = result.isFinal
                     print("Text \(result.bestTranscription.formattedString)")
                     
-                    self.addFurniture(name: result.bestTranscription.formattedString)
+                    self.addFurniture(called: result.bestTranscription.formattedString)
                 }
                 
                 if error != nil || isFinal {

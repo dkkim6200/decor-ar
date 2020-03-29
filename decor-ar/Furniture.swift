@@ -8,3 +8,18 @@
 
 import RealityKit
 import ARKit
+
+struct Furniture {
+    let furniture : Entity?
+    let furniturePreview : Entity?
+    
+    init() {
+        furniture = nil
+        furniturePreview = nil
+    }
+    
+    init(furniture : Entity, furniturePreview : Entity) {
+        self.furniture = furniture.clone(recursive: true)
+        self.furniturePreview = furniturePreview.clone(recursive: true)
+    }
+}
