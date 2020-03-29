@@ -15,6 +15,10 @@
 		834F72C1240B0D2500E24DB7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 834F72BF240B0D2500E24DB7 /* LaunchScreen.storyboard */; };
 		83BF8290242EBD7F008FBA6D /* MultipeerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BF828F242EBD7F008FBA6D /* MultipeerSession.swift */; };
 		83BF829424301D3E008FBA6D /* Furniture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BF829324301D3E008FBA6D /* Furniture.swift */; };
+		83BF829624305595008FBA6D /* ARModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BF829524305595008FBA6D /* ARModelView.swift */; };
+		83BF82982430563F008FBA6D /* ARModelView+SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BF82972430563F008FBA6D /* ARModelView+SpeechRecognizer.swift */; };
+		83BF829A24305861008FBA6D /* ARModelView+Collaboration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BF829924305861008FBA6D /* ARModelView+Collaboration.swift */; };
+		83BF829C243059A6008FBA6D /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BF829B243059A6008FBA6D /* Utilities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +32,10 @@
 		834F72C2240B0D2500E24DB7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		83BF828F242EBD7F008FBA6D /* MultipeerSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipeerSession.swift; sourceTree = "<group>"; };
 		83BF829324301D3E008FBA6D /* Furniture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Furniture.swift; sourceTree = "<group>"; };
+		83BF829524305595008FBA6D /* ARModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARModelView.swift; sourceTree = "<group>"; };
+		83BF82972430563F008FBA6D /* ARModelView+SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARModelView+SpeechRecognizer.swift"; sourceTree = "<group>"; };
+		83BF829924305861008FBA6D /* ARModelView+Collaboration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARModelView+Collaboration.swift"; sourceTree = "<group>"; };
+		83BF829B243059A6008FBA6D /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +70,11 @@
 			children = (
 				834F72B4240B0D2100E24DB7 /* AppDelegate.swift */,
 				834F72B6240B0D2100E24DB7 /* ARContentView.swift */,
+				83BF829524305595008FBA6D /* ARModelView.swift */,
+				83BF82972430563F008FBA6D /* ARModelView+SpeechRecognizer.swift */,
+				83BF829924305861008FBA6D /* ARModelView+Collaboration.swift */,
 				83BF828F242EBD7F008FBA6D /* MultipeerSession.swift */,
+				83BF829B243059A6008FBA6D /* Utilities.swift */,
 				83BF829324301D3E008FBA6D /* Furniture.swift */,
 				834F72B8240B0D2100E24DB7 /* Experience.rcproject */,
 				834F72BA240B0D2500E24DB7 /* Assets.xcassets */,
@@ -153,8 +165,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				83BF8290242EBD7F008FBA6D /* MultipeerSession.swift in Sources */,
+				83BF829624305595008FBA6D /* ARModelView.swift in Sources */,
 				834F72B7240B0D2100E24DB7 /* ARContentView.swift in Sources */,
 				83BF829424301D3E008FBA6D /* Furniture.swift in Sources */,
+				83BF82982430563F008FBA6D /* ARModelView+SpeechRecognizer.swift in Sources */,
+				83BF829A24305861008FBA6D /* ARModelView+Collaboration.swift in Sources */,
+				83BF829C243059A6008FBA6D /* Utilities.swift in Sources */,
 				834F72B5240B0D2100E24DB7 /* AppDelegate.swift in Sources */,
 				834F72B9240B0D2100E24DB7 /* Experience.rcproject in Sources */,
 			);
