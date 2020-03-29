@@ -86,6 +86,8 @@ extension ARContentView {
         
         private var furnitureDict : [String : Entity] = [:]
         
+        private var configuration : ARWorldTrackingConfiguration?
+        
         func makeUIView(context: Context) -> ARView {
             initARView()
             initSpeechRecognizer()
@@ -118,9 +120,26 @@ extension ARContentView {
 //            arView.scene.anchors.append(pointerScene)
 //            arView.scene.anchors.append(furnitureScene)
             
+            arView.automaticallyConfigureSession = false
+            
+            configuration = ARWorldTrackingConfiguration()
+
+            // Enable a collaborative session.
+            configuration?.isCollaborationEnabled = true
+            
+            // Enable realistic reflections.
+            configuration?.environmentTexturing = .automatic
+            
+            if ARWorldTrackingConfiguration.supportsFrameSemantics(.personSegmentationWithDepth) {
+                configuration?.frameSemantics.insert(.personSegmentationWithDepth)
+            }
+            
             #if !targetEnvironment(simulator)
             arView.session.delegate = self
             #endif
+
+            // Begin the session.
+            arView.session.run(configuration!)
         }
         
         func initSpeechRecognizer() {
@@ -169,15 +188,20 @@ extension ARContentView {
                         return
                     }
                     
-                    let newAnchor = AnchorEntity(raycastResult: result)
+                    let newAnchor = AnchorEntity()
                     newAnchor.addChild(currentFurniture!)
                     newAnchor.addChild(currentFurniturePreview!)
-                    arView.scene.anchors.append(newAnchor)
+                    
+                    var transform = Transform(matrix: result.worldTransform)
+                    newAnchor.move(to: transform, relativeTo: nil)
                     
                     if (currentAnchor != nil) {
                         newAnchor.transform.rotation = currentAnchor?.transform.rotation as! simd_quatf
+//                        newAnchor.setOrientation((currentAnchor?.transform.rotation)!, relativeTo: nil)
                         arView.scene.removeAnchor(currentAnchor as! HasAnchoring)
                     }
+                    
+                    arView.scene.anchors.append(newAnchor)
                     
                     currentAnchor = newAnchor
                 }
@@ -196,8 +220,8 @@ extension ARContentView {
             if (name == "bookshelf") {
                 placingFurniture = true
                 
-                currentFurniture = furnitureDict["Bookshelf"]
-                currentFurniturePreview = furnitureDict["Bookshelf Preview"]
+                currentFurniture = furnitureDict["Bookshelf"]?.clone(recursive: true)
+                currentFurniturePreview = furnitureDict["Bookshelf Preview"]?.clone(recursive: true)
                 
                 let bookshelfPreviewModel = findEntityWithModelComponent(e: currentFurniturePreview!)
     
@@ -227,6 +251,7 @@ extension ARContentView {
             currentAnchor?.transform.rotation = .init(angle: -angle, axis: SIMD3<Float>(0, 1, 0))
         }
         
+        @available(*, deprecated)
         func togglePeopleOcclusion() {
             #if !targetEnvironment(simulator)
             guard let config = arView.session.configuration as? ARWorldTrackingConfiguration else {
@@ -321,7 +346,7 @@ extension ARContentView {
         }
         
         // MARK: SFSpeechRecognizerDelegate
-        
+
         public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
             if available {
                 self.recordEnabled = true
