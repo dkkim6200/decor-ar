@@ -162,17 +162,24 @@ extension ARContentView {
             case .normal:
                 if (placingFurniture) {
                     let results = arView.raycast(from: arView.center,
-                                                allowing: .existingPlaneInfinite,
+                                                 allowing: .estimatedPlane,
                                                 alignment: .horizontal)
                     
                     guard let result = results.first else {
                         return
                     }
                     
-                    let resultTransform = Transform(matrix: result.worldTransform)
-                    let rotation = currentAnchor!.transform.rotation
-                    currentAnchor!.move(to: resultTransform, relativeTo: nil)
-                    currentAnchor!.transform.rotation = rotation
+                    let newAnchor = AnchorEntity(raycastResult: result)
+                    newAnchor.addChild(currentFurniture!)
+                    newAnchor.addChild(currentFurniturePreview!)
+                    arView.scene.anchors.append(newAnchor)
+                    
+                    if (currentAnchor != nil) {
+                        newAnchor.transform.rotation = currentAnchor?.transform.rotation as! simd_quatf
+                        arView.scene.removeAnchor(currentAnchor as! HasAnchoring)
+                    }
+                    
+                    currentAnchor = newAnchor
                 }
                 
             case .notAvailable:
@@ -199,11 +206,11 @@ extension ARContentView {
                 modelComp.materials = [mat]
                 bookshelfPreviewModel?.components.set(modelComp)
                 
-                currentAnchor = AnchorEntity(plane: .horizontal)
-                currentAnchor?.addChild(currentFurniture!)
-                currentAnchor?.addChild(currentFurniturePreview!)
-                
                 currentFurniture?.isEnabled = false
+                
+//                currentAnchor = AnchorEntity(plane: .horizontal)
+//                currentAnchor?.addChild(currentFurniture!)
+//                currentAnchor?.addChild(currentFurniturePreview!)
             }
         }
         
@@ -213,6 +220,7 @@ extension ARContentView {
             self.placingFurniture = false
             currentFurniturePreview?.isEnabled = false
             currentFurniture?.isEnabled = true
+            currentAnchor = nil
         }
         
         func setFurnitureRotation(angle: Float) {
