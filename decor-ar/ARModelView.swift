@@ -34,6 +34,8 @@ final class ARViewModel: NSObject, UIViewRepresentable, ObservableObject, ARSess
     internal var recognitionTask: SFSpeechRecognitionTask?
     internal let audioEngine = AVAudioEngine()
     
+    private var lastAnchorUpdate : TimeInterval = NSDate().timeIntervalSince1970
+    
     var multipeerSession: MultipeerSession?
     // A dictionary to map MultiPeer IDs to ARSession ID's.
     // This is useful for keeping track of which peer created which ARAnchors.
@@ -48,6 +50,13 @@ final class ARViewModel: NSObject, UIViewRepresentable, ObservableObject, ARSess
         let furnitureScene = try! Experience.loadFurniture()
         furnitureDict[furnitureScene.bookshelf!.name] = furnitureScene.bookshelf
         furnitureDict[furnitureScene.bookshelfPreview!.name] = furnitureScene.bookshelfPreview
+        
+        let bookshelfPreviewModel = findEntityWithModelComponent(e: furnitureScene.bookshelfPreview!)
+
+        var modelComp : ModelComponent = (bookshelfPreviewModel?.components[ModelComponent])!
+        let mat = SimpleMaterial(color: .init(white: 1.0, alpha: 0.3), isMetallic: false)
+        modelComp.materials = [mat]
+        bookshelfPreviewModel?.components.set(modelComp)
         
         for (i, j) in furnitureDict {
             print("\(i) : \(j)")
@@ -121,15 +130,20 @@ final class ARViewModel: NSObject, UIViewRepresentable, ObservableObject, ARSess
                     arView.scene.removeAnchor(currentAnchor as! HasAnchoring)
                 }
                 
-                arView.scene.anchors.append(newAnchor)
+                arView.scene.addAnchor(newAnchor)
                 currentAnchor = newAnchor
                 
-                let newARAnchor = ARAnchor(name: currentFurnitureName + "-Preview " + String(NSDate().timeIntervalSince1970), transform: newAnchor.transform.matrix)
-                if (currentARAnchor != nil) {
-                    arView.session.remove(anchor: currentARAnchor!)
+                let currentTime = NSDate().timeIntervalSince1970
+                
+                if (currentTime - lastAnchorUpdate > 0.5) {
+                    lastAnchorUpdate = currentTime
+                    let newARAnchor = ARAnchor(name: currentFurnitureName + "-Preview " + String(NSDate().timeIntervalSince1970), transform: newAnchor.transform.matrix)
+                    if (currentARAnchor != nil) {
+                        arView.session.remove(anchor: currentARAnchor!)
+                    }
+                    arView.session.add(anchor: newARAnchor)
+                    currentARAnchor = newARAnchor
                 }
-                arView.session.add(anchor: newARAnchor)
-                currentARAnchor = newARAnchor
             }
             
         case .notAvailable:
@@ -150,13 +164,6 @@ final class ARViewModel: NSObject, UIViewRepresentable, ObservableObject, ARSess
             currentFurniture = furnitureDict["Bookshelf"]?.clone(recursive: true)
             currentFurniturePreview = furnitureDict["Bookshelf-Preview"]?.clone(recursive: true)
             
-            let bookshelfPreviewModel = findEntityWithModelComponent(e: currentFurniturePreview!)
-
-            var modelComp : ModelComponent = (bookshelfPreviewModel?.components[ModelComponent])!
-            let mat = SimpleMaterial(color: .init(white: 1.0, alpha: 0.3), isMetallic: false)
-            modelComp.materials = [mat]
-            bookshelfPreviewModel?.components.set(modelComp)
-            
             currentFurniture?.isEnabled = false
             
 //                currentAnchor = AnchorEntity(plane: .horizontal)
@@ -171,7 +178,9 @@ final class ARViewModel: NSObject, UIViewRepresentable, ObservableObject, ARSess
         self.placingFurniture = false
         
         let newARAnchor = ARAnchor(name: currentFurnitureName + " " + String(NSDate().timeIntervalSince1970), transform: currentAnchor!.transformMatrix(relativeTo: nil))
-        arView.session.remove(anchor: currentARAnchor!)
+        if (currentARAnchor != nil) {
+            arView.session.remove(anchor: currentARAnchor!)
+        }
         arView.session.add(anchor: newARAnchor)
         
         currentFurniturePreview?.isEnabled = false

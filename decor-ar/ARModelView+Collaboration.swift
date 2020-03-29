@@ -35,13 +35,7 @@ extension ARViewModel {
     }
     
     func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        print("===================================")
         for anchor in anchors {
-            if (anchor.name != nil && !anchor.name!.isEmpty) {
-                print(anchor.name!)
-            }
-            print(anchor.sessionIdentifier == arView.session.identifier)
-            
             if let participantAnchor = anchor as? ARParticipantAnchor {
                 collaborationInfoLabel = "Established joint experience with a peer."
                 // ...
@@ -58,6 +52,10 @@ extension ARViewModel {
                 arView.scene.addAnchor(anchorEntity)
             }
             else if anchor.sessionIdentifier != arView.session.identifier {
+                if (anchor.name != nil && !anchor.name!.isEmpty) {
+                    print(anchor.name!)
+                }
+                
                 guard let furnitureName = anchor.name?.components(separatedBy: " ").first else {
                     continue;
                 }
@@ -66,10 +64,10 @@ extension ARViewModel {
                 anchorEntity.name = anchor.name!
                 
                 if furnitureName == "Bookshelf" {
-                    anchorEntity.addChild(furnitureDict["Bookshelf"]!)
+                    anchorEntity.addChild(furnitureDict["Bookshelf"]!.clone(recursive: true))
                 }
                 else if furnitureName == "Bookshelf-Preview" {
-                    anchorEntity.addChild(furnitureDict["Bookshelf-Preview"]!)
+                    anchorEntity.addChild(furnitureDict["Bookshelf-Preview"]!.clone(recursive: true))
                 }
                 
                 arView.scene.addAnchor(anchorEntity)
@@ -78,13 +76,12 @@ extension ARViewModel {
     }
     
     func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
-        print("===================================")
         for anchor in anchors {
             if anchor.sessionIdentifier != arView.session.identifier {
                 guard let anchorName = anchor.name else {
                     continue;
                 }
-                
+
                 let anchorEntity = arView.scene.findEntity(named: anchorName)
                 guard let hasAnchoring = anchorEntity as? HasAnchoring else {
                     continue;
@@ -152,7 +149,7 @@ extension ARViewModel {
     }
         
     func peerLeft(_ peer: MCPeerID) {
-        collaborationInfoLabel = "A peer has left the shared experience."
+        collaborationInfoLabel = "A peer \(peer.displayName) has left the shared experience."
         
         // Remove all ARAnchors associated with the peer that just left the experience.
         if let sessionID = peerSessionIDs[peer] {
